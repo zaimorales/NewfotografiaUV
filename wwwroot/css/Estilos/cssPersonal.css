@@ -1,0 +1,15 @@
+﻿#tblEstudiante_wrapper .dataTables_info {
+    margin-top: -.2rem;
+}
+
+#tblEstudiante_wrapper .dataTables_paginate {
+    margin-top: -1.8rem;
+}
+
+#tblEstudiante_filter {
+    display: none;
+}
+
+#tblEstudiante_info {
+    color: #026ad5;
+}

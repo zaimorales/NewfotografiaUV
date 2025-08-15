@@ -20,5 +20,6 @@ namespace Fotografia.Models
         public DateTime DFUltModif { get; set; }
         public DateTime DFBaja { get; set; }
         public char? CIndActivo { get; set; }
+        public required byte[] BFoto { get; set; }
     }
 }

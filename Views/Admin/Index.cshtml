@@ -65,64 +65,74 @@
     </div>
 </div>
 
-<div class="modal fade" id="mdlAgregarEmpleado" tabindex="-1" aria-labelledby="modalAgregarEmpleadoLabel" aria-hidden="true">
+<div class="modal fade" id="mdlAgregarEmpleado" tabindex="-1" aria-labelledby="hAgregarEmpleado" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
             <!-- Header -->
             <div class="modal-header">
-                <h5 class="modal-title" id="modalAgregarEmpleadoLabel">Agregar Empleado</h5>
+                <h5 class="modal-title" id="hAgregarEmpleado">Agregar Empleado</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
             <!-- Body -->
             <div class="modal-body">
                 <form id="formAgregarEmpleado">
-                    <div class="mt-3">
-                        <!-- Buscar empleado -->
-                        <div class="input-group mb-3">
-                            <input type="text" id="txtEmpleado" class="form-control" placeholder="Buscar empleado por clave o no. personal..." />
-                            <button class="btn btn-primary" id="btnBuscar" type="button">Buscar</button>
-                        </div>
-
-                        <!-- Permisos y Admin -->
-                        <div class="d-flex align-items-center gap-3">
-                            <select id="ddlPermisos" class="form-select w-auto">
-                                <option value="" selected hidden disabled>Fotos a cargar</option>
-                                <option value="ep">Estudiante y Personal</option>
-                                <option value="e">Estudiante</option>
-                                <option value="p">Personal</option>
-                            </select>
-
-                            <div class="form-check">
-                                <input type="checkbox" id="txtAdmin" class="form-check-input">
-                                <label class="form-check-label" for="txtAdmin">Permisos de administrador</label>
-                            </div>
-                        </div>
+                    <!-- Buscar empleado -->
+                    <div class="input-group mb-3">
+                        <input type="text" id="txtBusqueda" class="form-control" placeholder="Buscar empleado por clave o no. personal..." />
+                        <button class="btn btn-primary" id="btnBuscar" type="button">Buscar</button>
                     </div>
+
+                    <!-- Select oculto de resultados -->
+                    <div id="divBusqueda" class="mt-2" style="display: none;">
+                        <label for="ddlResultados" class="text-muted">Selecciona un empleado:</label>
+                        <select id="ddlResultados" class="form-select mt-1">
+                            <option value="" selected hidden>Seleccione...</option>
+                        </select>
+                    </div>
+
                     <hr />
                     <div class="mt-3">
                         <p>Datos del empleado</p>
-                        <div class="form-group">
-                            <label class="text-muted" for="txtNombre">Nombre:</label>
+                        <div class="form-group d-flex align-items-center">
+                            <label class="text-muted col-3" for="txtNoPersonal">No. Personal:</label>
                             <input type="text" id="txtNoPersonal" class="form-control mt-1" placeholder="No hay datos disponibles..." disabled />
                         </div>
-                        <div class="form-group mt-3">
-                            <label class="text-muted" for="txtCorreo">Correo:</label>
-                            <input type="email" id="txtUsuario" class="form-control mt-1" placeholder="No hay datos disponibles..." disabled />
+                        <div class="form-group d-flex align-items-center mt-2">
+                            <label class="text-muted col-3" for="txtUsuario">Usuario:</label>
+                            <input type="text" id="txtUsuario" class="form-control mt-1" placeholder="No hay datos disponibles..." disabled />
                         </div>
-                        <div class="form-group mt-3">
-                            <label class="text-muted" for="txtTelefono">Teléfono:</label>
-                            <input type="tel" id="txtTelefono" class="form-control mt-1" placeholder="No hay datos disponibles..." disabled />
+                        <div class="form-group d-flex align-items-center mt-2">
+                            <label class="text-muted col-3" for="txtDep">Departamento:</label>
+                            <input type="text" id="txtDep" class="form-control mt-1" placeholder="No hay datos disponibles..." disabled />
+                        </div>
+                    </div>
+                    <hr />
+                    <p>Asignar permisos</p>
+                    <!-- Permisos y Admin -->
+                    <div class="d-flex align-items-center gap-3">
+                        <select id="ddlPermisos" class="form-select w-auto" disabled required >
+                            <option value="" selected hidden disabled>Fotos a cargar</option>
+                            <option value="a">Estudiante y Personal</option>
+                            <option value="e">Estudiante</option>
+                            <option value="p">Personal</option>
+                            <option value="n">Ninguno</option>
+                        </select>
+
+                        <div class="form-check">
+                            <input type="checkbox" id="txtAdmin" class="form-check-input" disabled >
+                            <label class="form-check-label" for="txtAdmin">Administrador</label>
                         </div>
                     </div>
                 </form>
             </div>
 
+
             <!-- Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnAgregarEmpleado">Agregar</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnAgregarEmpleado">Agregar</button>
             </div>
 
         </div>

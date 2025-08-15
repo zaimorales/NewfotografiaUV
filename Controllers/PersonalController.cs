@@ -1,17 +1,65 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Fotografia.Models;
+using Fotografia.Data;
 using System;
+using System.Collections.Generic;
+using Fotografia.ViewModels;
 
 namespace Fotografia.Controllers
 {
     public class PersonalController : Controller
     {
-        public IActionResult Index()
+        private readonly DaEmpleado _daEmpleado;
+
+        public PersonalController(DaEmpleado daEmpleado)
         {
-            var personal = new List<MoFoto>
+            _daEmpleado = daEmpleado ?? throw new ArgumentNullException(nameof(daEmpleado));
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            // Recupera la lista de empleados desde tu capa de datos
+            var lsEmpleados = await _daEmpleado.ObtenerEmpleados() ?? new List<MoEmpleado>();
+            return View(lsEmpleados);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AgregarEmpleado(VmAgregarEmpleado vm)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { success = false, message = "Datos inválidos" });
+
+            await _daEmpleado.InsertarEmpleado(vm);
+
+            return Ok(new { success = true });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MostrarFoto(int id)
+        {
+            var empleado = (await _daEmpleado.ObtenerEmpleados(id)).FirstOrDefault();
+            if (empleado == null || empleado.BFoto == null)
+                return NotFound();
+
+            return File(empleado.BFoto, "image/jpeg"); // o "image/png" si aplica
+        }
+
+
+        [HttpPost]
+        public IActionResult ActualizarEmpleado([FromBody] MoEmpleado empleado)
+        {
+            if (empleado == null || empleado.NId == 0)
+                return BadRequest(new { success = false, message = "Datos inválidos" });
+
+            try
             {
-            };
-            return View(personal);
+                _daEmpleado.ActualizarEmpleado(empleado);
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
         }
     }
 }

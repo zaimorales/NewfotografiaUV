@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using System.Data;
 using Dapper;
+using Fotografia.ViewModels;
 
 namespace Fotografia.Data;
 
@@ -11,28 +12,38 @@ public class DaEmpleado
 
     public DaEmpleado(IConfiguration configuration) => _connection = configuration?.GetConnectionString("DefaultConnection") ?? "";
 
-    public List<MoEmpleado> ObtenerEmpleados()
+    public async Task<IEnumerable<MoEmpleado>> ObtenerEmpleados(int? nId = null)
     {
         using var connection = new SqlConnection(_connection);
-        var result = connection.Query<MoEmpleado>(
+        return await connection.QueryAsync<MoEmpleado>(
             "PAS_EMPLEADO",
+            new { nId },
             commandType: CommandType.StoredProcedure
         );
-        return result.ToList();
     }
 
-    public async Task InsertarEmpleado(MoEmpleado moEmpleado)
+
+    public async Task InsertarEmpleado(VmAgregarEmpleado vmAgregarEmpleado)
     {
         using var connection = new SqlConnection(_connection);
+        byte[]? fotoBytes = null;
+
+        if (vmAgregarEmpleado.Foto != null && vmAgregarEmpleado.Foto.Length > 0)
+        {
+            using var ms = new MemoryStream();
+            await vmAgregarEmpleado.Foto.CopyToAsync(ms);
+            fotoBytes = ms.ToArray();
+        }
         await connection.ExecuteAsync(
             "PAI_EMPLEADO",
             new
             {
-                moEmpleado.SUsuario,
-                moEmpleado.NNoPerson,
-                moEmpleado.SDep,
-                moEmpleado.CPermisos,
-                moEmpleado.BAdmin,
+                vmAgregarEmpleado.SUsuario,
+                vmAgregarEmpleado.NNoPerson,
+                vmAgregarEmpleado.SDep,
+                vmAgregarEmpleado.CPermisos,
+                vmAgregarEmpleado.BAdmin,
+                BFoto = fotoBytes
             },
             commandType: CommandType.StoredProcedure
         );

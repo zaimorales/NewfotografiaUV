@@ -8,6 +8,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<DaFoto>();
 builder.Services.AddScoped<ClsFoto>();
+builder.Services.AddScoped<ClsEmpleado>();
+builder.Services.AddScoped<DaEmpleado>();
 builder.Services.AddScoped<DaEstudiante>();
 
 var app = builder.Build();

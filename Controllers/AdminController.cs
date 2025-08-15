@@ -1,28 +1,45 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Fotografia.Models;
+using Fotografia.Data;
+using Fotografia.Functions;
+using Fotografia.ViewModels;
+using System.Security.Cryptography;
 
 namespace Fotografia.Controllers;
 
 public class AdminController : Controller
 {
-    private readonly ILogger<AdminController> _logger;
+    private readonly ClsEmpleado _clsEmpleado;
 
-    public AdminController(ILogger<AdminController> logger)
+    public AdminController(ClsEmpleado clsEmpleado)
     {
-        _logger = logger;
+        _clsEmpleado = clsEmpleado ?? throw new ArgumentNullException(nameof(clsEmpleado));
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var model = new List<MoEmpleado>
+        var lsEmpleados = await _clsEmpleado.ObtenerEmpleados();
+        return View(lsEmpleados); // Ahora es IEnumerable<MoEmpleado>
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AgregarEmpleado([FromBody] VmAgregarEmpleado empleado)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(new { mensaje = "Datos inválidos." });
+
+        await _clsEmpleado.Agregar(new VmAgregarEmpleado
         {
-        };
-        return View(model);
+            NNoPerson = empleado.NNoPerson,
+            SUsuario = empleado.SUsuario,
+            SDep = empleado.SDep,
+            CPermisos = empleado.CPermisos,
+            BAdmin = empleado.BAdmin
+        });
+
+        return Ok(new { mensaje = "Empleado agregado correctamente." });
     }
 
-    public IActionResult AgregarEmpleado()
-    {
-        return View();
-    }
+
 }
