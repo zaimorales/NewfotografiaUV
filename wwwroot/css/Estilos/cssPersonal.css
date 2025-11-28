@@ -13,3 +13,31 @@
 #tblEstudiante_info {
     color: #026ad5;
 }
+.foto-thumb {
+    border: 2px solid transparent !important;
+    border-radius: 6px;
+    transition: all .15s ease-in-out;
+}
+
+.foto-thumb.selected {
+    border: 3px solid #0d6efd !important; /* azul bootstrap */
+    box-shadow: 0 0 8px rgba(13, 110, 253, 0.7);
+    transform: scale(1.05);
+}
+
+.thumb-delete {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 5;
+}
