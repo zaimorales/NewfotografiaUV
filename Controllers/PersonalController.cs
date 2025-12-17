@@ -61,5 +61,42 @@ namespace Fotografia.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ActualizarFoto(int id, IFormFile foto)
+        {
+            if (foto == null || foto.Length == 0)
+                return BadRequest("Archivo inválido");
+
+            byte[] fotoBytes;
+            using (var ms = new MemoryStream())
+            {
+                await foto.CopyToAsync(ms);
+                fotoBytes = ms.ToArray();
+            }
+
+            await _daEmpleado.ActualizarFotoEmpleado(id, fotoBytes);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ActualizarFotoEmpleado(int id, IFormFile foto)
+        {
+            if (foto == null || foto.Length == 0)
+                return BadRequest("Imagen inválida");
+
+            byte[] bytes;
+            using (var ms = new MemoryStream())
+            {
+                await foto.CopyToAsync(ms);
+                bytes = ms.ToArray();
+            }
+
+            await _daEmpleado.ActualizarFotoEmpleado(id, bytes);
+            return Ok();
+        }
+
+
     }
 }

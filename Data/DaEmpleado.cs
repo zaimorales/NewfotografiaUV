@@ -76,4 +76,39 @@ public class DaEmpleado
             commandType: CommandType.StoredProcedure
         );
     }
+
+    public async Task ActualizarFotoEmpleado(int id, byte[] foto)
+    {
+        using var connection = new SqlConnection(_connection);
+        await connection.ExecuteAsync(
+            "PAU_FOTO_EMPLEADO",
+            new { NId = id, BFoto = foto },
+            commandType: CommandType.StoredProcedure
+        );
+    }
+
+    public async Task ActualizarFotoEmpleado(int nId, IFormFile foto)
+    {
+        if (foto == null || foto.Length == 0)
+            throw new Exception("Foto inválida");
+
+        byte[] fotoBytes;
+        using (var ms = new MemoryStream())
+        {
+            await foto.CopyToAsync(ms);
+            fotoBytes = ms.ToArray();
+        }
+
+        using var connection = new SqlConnection(_connection);
+        await connection.ExecuteAsync(
+            "PAU_FOTO_EMPLEADO",
+            new
+            {
+                NId = nId,
+                BFoto = fotoBytes
+            },
+            commandType: CommandType.StoredProcedure
+        );
+    }
+
 }

@@ -96,6 +96,106 @@ function fnEditarEmpleado(id, usuario) {
     modal.show();
 }
 
+document.getElementById("txtNuevaFotoEmpleado")
+    .addEventListener("change", function () {
+
+        const file = this.files[0];
+        if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith(".jpg")) {
+            alert("Solo se permiten imágenes JPG");
+            this.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = e => {
+            const imgPreview = document.getElementById("imgPreviewNuevaFoto");
+            imgPreview.src = e.target.result;
+            imgPreview.classList.remove("d-none");
+        };
+        reader.readAsDataURL(file);
+    });
+
+document.getElementById("mdlEditarFotoEmpleado")
+    .addEventListener("hidden.bs.modal", () => {
+
+        const input = document.getElementById("txtNuevaFotoEmpleado");
+        input.value = "";
+        input.removeAttribute("data-id");
+
+        document.getElementById("imgPreviewNuevaFoto").src = "";
+        document.getElementById("imgPreviewNuevaFoto").classList.add("d-none");
+    });
+
+
+async function fnGuardarNuevaFoto() {
+
+    const input = document.getElementById("txtNuevaFotoEmpleado");
+    const id = input.getAttribute("data-id");
+    const file = input.files[0];
+
+    if (!file) {
+        alert("Seleccione una imagen");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("id", id);
+    formData.append("foto", file);
+
+    const response = await fetch("/Personal/ActualizarFoto", {
+        method: "POST",
+        body: formData
+    });
+
+    if (response.ok) {
+        alert("Foto actualizada correctamente ✅");
+
+        bootstrap.Modal
+            .getInstance(document.getElementById("mdlEditarFotoEmpleado"))
+            .hide();
+
+        location.reload();
+    } else {
+        alert("Error al actualizar la foto ❌");
+    }
+}
+
+async function editarEmpleado_GuardarFoto() {
+
+    const input = document.getElementById("txtNuevaFotoEmpleado");
+    const id = input.getAttribute("data-id");
+    const file = input.files[0];
+
+    if (!file) {
+        alert("Seleccione una imagen");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("id", id);
+    formData.append("foto", file);
+
+    const response = await fetch("/Personal/ActualizarFotoEmpleado", {
+        method: "POST",
+        body: formData
+    });
+
+    if (response.ok) {
+        alert("Foto actualizada correctamente ✅");
+
+        bootstrap.Modal
+            .getInstance(document.getElementById("mdlEditarFotoEmpleado"))
+            .hide();
+
+        location.reload();
+    } else {
+        alert("Error al actualizar la foto ❌");
+    }
+}
+
+
 
 // --- PREVIEW MULTIPLE + SELECCIÓN DE UNA SOLA FOTO ---
 
