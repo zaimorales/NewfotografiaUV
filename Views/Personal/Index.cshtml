@@ -65,11 +65,17 @@
                         <td>@empleado.DFUltModif.ToString("dd/MM/yyyy")</td>
                         <td>@empleado.CIndActivo</td>
                         <td>
-                            <button class="btn btn-outline-primary btn-sm" title="Ver" onclick="fnVerEmpleado(@empleado.NId, '@empleado.SUsuario')">
+                            <button class="btn btn-outline-primary btn-sm border-0" title="Ver" 
+                                onclick="fnVerEmpleado(@empleado.NId, '@empleado.SUsuario')">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
-                            <button class="btn btn-outline-secondary btn-sm" title="Editar" onclick="fnEditarEmpleado(@empleado.NId, '@empleado.SUsuario')">
+                            <button class="btn btn-outline-secondary btn-sm border-0" title="Editar" 
+                                onclick="fnEditarEmpleado(@empleado.NId, '@empleado.SUsuario')">
                                 <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm border-0" title="Eliminar" 
+                                onclick="fnEliminarEmpleado(@empleado.NId, '@empleado.SUsuario')">
+                                <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </td>
                     </tr>
@@ -202,11 +208,8 @@
                                         <i class="fa-solid fa-plus fs-5"></i>
                                     </label>
                                 </div>
-
                             </div>
                         </div>
-
-
                     </div>
                 </div>
 

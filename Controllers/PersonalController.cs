@@ -97,6 +97,16 @@ namespace Fotografia.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        public IActionResult EliminarEmpleado([FromBody] VmEliminarEmpleado vm)
+        {
+            Console.WriteLine("ID RECIBIDO: " + vm.NId);
+            if (vm == null || vm.NId <= 0)
+                return BadRequest(new { success = false });
+            _daEmpleado.EliminarEmpleado(vm.NId);
+
+            return Ok(new { success = true });
+        }
 
     }
 }

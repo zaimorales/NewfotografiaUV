@@ -100,7 +100,12 @@ document.getElementById("txtNuevaFotoEmpleado")
     .addEventListener("change", function () {
 
         const file = this.files[0];
-        if (!file) return;
+        const btnSubir = document.getElementById("txtNuevaFotoEmpleado");
+
+        if (file) { // si ya se selecciono un archivo el boton de subir se oculta
+            btnSubir.disabled = true;
+            btnSubir.style.display = "none";
+        }
 
         if (!file.name.toLowerCase().endsWith(".jpg")) {
             alert("Solo se permiten imágenes JPG");
@@ -515,3 +520,30 @@ document.getElementById("btnCancelarCarga").onclick = () => {
 
     // No hacemos NINGÚN cambio a las fotos ya cargadas
 };
+
+// ===========================
+// ELIMINAR EMPLEADO
+// ===========================
+async function fnEliminarEmpleado(id, usuario) {
+
+    if (!confirm(`¿Deseas eliminar al empleado "${usuario}"?`))
+        return;
+
+    const response = await fetch("/Personal/EliminarEmpleado", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ NId: id })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+        alert("Empleado eliminado correctamente ✅");
+        location.reload();
+    } else {
+        alert("No se pudo eliminar ❌");
+    }
+}
+
