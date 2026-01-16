@@ -67,17 +67,18 @@ public class DaEmpleado
         );
     }
 
-    public void EliminarEmpleado(int nId)
+    public int EliminarEmpleado(int nId)
     {
         using var connection = new SqlConnection(_connection);
-        connection.Execute(
+        return connection.QuerySingle<int>(
             "PAE_EMPLEADO",
             new { nId },
             commandType: CommandType.StoredProcedure
         );
-
-
     }
+
+
+
 
     public async Task ActualizarFotoEmpleado(int id, byte[] foto)
     {

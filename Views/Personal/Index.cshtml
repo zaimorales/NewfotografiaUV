@@ -69,10 +69,12 @@
                                 onclick="fnVerEmpleado(@empleado.NId, '@empleado.SUsuario')">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
+
                             <button class="btn btn-outline-secondary btn-sm border-0" title="Editar" 
                                 onclick="fnEditarEmpleado(@empleado.NId, '@empleado.SUsuario')">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
+
                             <button class="btn btn-outline-danger btn-sm border-0" title="Eliminar" 
                                 onclick="fnEliminarEmpleado(@empleado.NId, '@empleado.SUsuario')">
                                 <i class="fa-solid fa-trash-can"></i>
@@ -302,6 +304,44 @@
                     class="btn btn-primary" 
                     onclick="editarEmpleado_GuardarFoto()">
                     Guardar cambios
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal para eliminar empleado --> 
+<div class="modal fade" id="mdlConfirmarEliminarEmpleado" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Confirmar eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p class="mb-0">
+                    ¿Deseas eliminar al empleado
+                    <strong id="spEmpleadoEliminar"></strong>?
+                </p>
+                <p class="text-muted mt-2 mb-0">
+                    Esta acción desactivará al empleado.
+                </p>
+                <div class="alert alert-danger d-none mt-3" id="alertEliminarEmpleado"></div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminarEmpleado">
+                    Eliminar
                 </button>
             </div>
 

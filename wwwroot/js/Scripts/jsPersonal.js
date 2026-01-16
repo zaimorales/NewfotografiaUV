@@ -521,29 +521,69 @@ document.getElementById("btnCancelarCarga").onclick = () => {
     // No hacemos NINGÚN cambio a las fotos ya cargadas
 };
 
+let empleadoEliminarId = null;
+let empleadoEliminarUsuario = null;
+
 // ===========================
 // ELIMINAR EMPLEADO
 // ===========================
 async function fnEliminarEmpleado(id, usuario) {
+    empleadoEliminarId = id;
+    empleadoEliminarUsuario = usuario;
 
-    if (!confirm(`¿Deseas eliminar al empleado "${usuario}"?`))
-        return;
+    // Actualiza el nombre en el modal
+    document.getElementById("spEmpleadoEliminar").textContent = usuario;
 
-    const response = await fetch("/Personal/EliminarEmpleado", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ NId: id })
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-        alert("Empleado eliminado correctamente ✅");
-        location.reload();
-    } else {
-        alert("No se pudo eliminar ❌");
-    }
+    // Muestra el modal de confirmación
+    const modal = new bootstrap.Modal(document.getElementById("mdlConfirmarEliminarEmpleado"));
+    modal.show();
+    
 }
 
+
+document.getElementById("btnConfirmarEliminarEmpleado")
+    .addEventListener("click", async function () {
+
+        if (!empleadoEliminarId) return;
+
+        const alertBox = document.getElementById("alertEliminarEmpleado");
+        alertBox.classList.add("d-none");
+        alertBox.textContent = "";
+
+        const response = await fetch("/Personal/EliminarEmpleado", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ NId: empleadoEliminarId })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            //  AQUÍ está la magia
+            alertBox.textContent = result.message;
+            alertBox.classList.remove("d-none");
+            return;
+        }
+
+        // Éxito
+        bootstrap.Modal
+            .getInstance(document.getElementById("mdlConfirmarEliminarEmpleado"))
+            .hide();
+
+        location.reload();
+    });
+
+document.getElementById("mdlConfirmarEliminarEmpleado")
+    .addEventListener("hidden.bs.modal", function () {
+
+        empleadoEliminarId = null;
+        empleadoEliminarUsuario = null;
+
+        document.getElementById("spEmpleadoEliminar").textContent = "";
+
+        const alertBox = document.getElementById("alertEliminarEmpleado");
+        alertBox.classList.add("d-none");
+        alertBox.textContent = "";
+    });
