@@ -68,6 +68,10 @@ namespace Fotografia.Controllers
             if (foto == null || foto.Length == 0)
                 return BadRequest("Archivo inválido");
 
+            var extension = Path.GetExtension(foto.FileName).ToLower();
+            if (extension != ".jpg" || foto.ContentType != "image/jpeg")
+                return BadRequest("Solo se permiten imágenes JPG 1");
+
             byte[] fotoBytes;
             using (var ms = new MemoryStream())
             {
@@ -85,6 +89,10 @@ namespace Fotografia.Controllers
         {
             if (foto == null || foto.Length == 0)
                 return BadRequest("Imagen inválida");
+
+            var extension = Path.GetExtension(foto.FileName).ToLower();
+            if (extension != ".jpg" || foto.ContentType != "image/jpeg")
+                return BadRequest("Solo se permiten imágenes JPG 2");
 
             byte[] bytes;
             using (var ms = new MemoryStream())

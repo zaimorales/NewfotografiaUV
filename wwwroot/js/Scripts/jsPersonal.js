@@ -35,6 +35,12 @@ function fnMostrarAgregarEmpleado() {
     modal.show();
 }
 
+function empleado_EsJpgValido(file) {
+    return file && file.type === "image/jpeg" &&
+        file.name.toLowerCase().endsWith(".jpg");
+}
+
+
 document.getElementById("frmAgregarEmpleado").addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -61,6 +67,28 @@ document.getElementById("frmAgregarEmpleado").addEventListener("submit", async f
         alert("Error inesperado al guardar.");
     }
 });
+
+function empleado_ResetFotosUI() {
+
+    // Reset array
+    empleado_fotos_temp = [];
+
+    // Inputs
+    document.getElementById("txtFotosEmpleado").value = "";
+    document.getElementById("fotoEmpleadoSeleccionada").value = "";
+
+    // Miniaturas
+    const lista = document.getElementById("divMiniaturasEmpleado");
+    lista.querySelectorAll(".foto-thumb").forEach(x => x.parentElement.remove());
+
+    // Vista inicial
+    document.getElementById("divContenedorFotosEmpleado").classList.add("d-none");
+    document.getElementById("divInfoEmpleado").classList.remove("d-none");
+
+    // Imagen principal
+    document.getElementById("imgEmpleadoPrincipal").src = "";
+    document.getElementById("spEmpleadoFotoNombre").innerText = "Foto";
+}
 
 function fnVerEmpleado(id, usuario) {
     const modal = new bootstrap.Modal(document.getElementById("mdlVerfotoPersonal"));
@@ -102,15 +130,15 @@ document.getElementById("txtNuevaFotoEmpleado")
         const file = this.files[0];
         const btnSubir = document.getElementById("txtNuevaFotoEmpleado");
 
+        if (!file.name.toLowerCase().endsWith(".jpg")) {
+            alert("Solo se permiten imágenes JPG js1");
+            this.value = "";
+            return;
+        }
+
         if (file) { // si ya se selecciono un archivo el boton de subir se oculta
             btnSubir.disabled = true;
             btnSubir.style.display = "none";
-        }
-
-        if (!file.name.toLowerCase().endsWith(".jpg")) {
-            alert("Solo se permiten imágenes JPG");
-            this.value = "";
-            return;
         }
 
         const reader = new FileReader();
@@ -126,11 +154,16 @@ document.getElementById("mdlEditarFotoEmpleado")
     .addEventListener("hidden.bs.modal", () => {
 
         const input = document.getElementById("txtNuevaFotoEmpleado");
+        // RESET TOTAL DEL INPUT FILE
         input.value = "";
+        input.disabled = false;
+        input.style.display = "block";
         input.removeAttribute("data-id");
 
-        document.getElementById("imgPreviewNuevaFoto").src = "";
-        document.getElementById("imgPreviewNuevaFoto").classList.add("d-none");
+        // Reset preview
+        const preview = document.getElementById("imgPreviewNuevaFoto");
+        preview.src = "";
+        preview.classList.add("d-none");
     });
 
 
@@ -214,9 +247,21 @@ function empleado_openFileInput() {
 
 function empleado_OnFilesSelected(input) {
     const nuevosArchivos = Array.from(input.files);
-    const lista = document.getElementById("divMiniaturasEmpleado");
 
-    // Mostrar contenedores correctos
+    if (nuevosArchivos.length === 0) return;
+
+    // ✅ VALIDAR PRIMERO
+    const archivosInvalidos = nuevosArchivos.filter(f => !empleado_EsJpgValido(f));
+
+    if (archivosInvalidos.length > 0) {
+        alert("Solo se permiten imágenes JPG");
+
+        // RESET limpio
+        input.value = "";
+        return;
+    }
+
+    // AHORA SÍ: mostrar contenedores
     document.getElementById("divInfoEmpleado").classList.add("d-none");
     document.getElementById("divContenedorFotosEmpleado").classList.remove("d-none");
 
@@ -346,10 +391,10 @@ modalEmpleado.addEventListener("drop", (e) => {
     if (files.length === 0) return;
 
     // Filtrar JPG
-    const jpgFiles = files.filter(f => f.name.toLowerCase().endsWith(".jpg"));
+    const jpgFiles = files.filter(empleado_EsJpgValido);
 
     if (jpgFiles.length === 0) {
-        alert("Solo se permiten imágenes JPG.");
+        alert("Solo se permiten imágenes JPG. js2");
         return;
     }
 
