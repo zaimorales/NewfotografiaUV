@@ -77,11 +77,11 @@ public class DaEmpleado
         );
     }
 
-
-
-
     public async Task ActualizarFotoEmpleado(int id, byte[] foto)
     {
+        if (foto.Length > 2 * 1024 * 1024)
+            throw new Exception("La imagen no debe superar 2 MB");
+
         using var connection = new SqlConnection(_connection);
         await connection.ExecuteAsync(
             "PAU_FOTO_EMPLEADO",

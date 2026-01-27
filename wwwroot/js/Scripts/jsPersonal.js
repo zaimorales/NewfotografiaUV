@@ -36,13 +36,30 @@ function fnMostrarAgregarEmpleado() {
 }
 
 function empleado_EsJpgValido(file) {
-    return file && file.type === "image/jpeg" &&
-        file.name.toLowerCase().endsWith(".jpg");
-}
+    const maxSizeMB = 2;
 
+    if (!file) return false;
+
+    if (file.type !== "image/jpeg") return false;
+    if (!file.name.toLowerCase().endsWith(".jpg")) return false;
+
+    if (file.size > maxSizeMB * 1024 * 1024) {
+        alert(`La imagen no debe superar ${maxSizeMB} MB`);
+        return false;
+    }
+
+    return true;
+}
 
 document.getElementById("frmAgregarEmpleado").addEventListener("submit", async function (e) {
     e.preventDefault();
+
+    // Validar que haya una foto seleccionada
+    const fotoInput = document.getElementById("fotoEmpleadoSeleccionada");
+    if (!fotoInput.files || fotoInput.files.length === 0) {
+        alert("Por favor, seleccione una imagen del empleado.");
+        return;
+    }
 
     const form = e.target;
     const formData = new FormData(form);
@@ -322,7 +339,6 @@ function empleado_OnFilesSelected(input) {
 
 }
 
-
 function empleado_SeleccionarFoto(index) {
     const foto = empleado_fotos_temp[index];
     if (!foto) return;
@@ -348,10 +364,7 @@ function empleado_SeleccionarFoto(index) {
     document.getElementById("fotoEmpleadoSeleccionada").files = dt.files;
 }
 
-
-
-
-//   DRAG & DROP PARA FOTOS
+//   DRAG & DROP PARA AGREGAR FOTOS
 
 const dropAreaEmpleado = document.getElementById("divDropEmpleado");
 const modalEmpleado = document.getElementById("mdlAgregarEmpleado");
@@ -495,6 +508,10 @@ document.getElementById("mdlAgregarEmpleado").addEventListener("hidden.bs.modal"
     document.getElementById("imgEmpleadoPrincipal").src = "";
     document.getElementById("spEmpleadoFotoNombre").innerText = "Foto";
 
+    // Resetear formulario completo
+    const form = document.getElementById("frmAgregarEmpleado");
+    form.reset();
+    empleado_ResetFotosUI();
 });
 
 function empleado_VerificarDuplicado(file, url) {

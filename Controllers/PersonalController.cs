@@ -26,6 +26,9 @@ namespace Fotografia.Controllers
         [HttpPost]
         public async Task<IActionResult> AgregarEmpleado(VmAgregarEmpleado vm)
         {
+            if (vm.Foto == null || vm.Foto.Length > 2 * 1024 * 1024) // comprobar tamaño de foto
+                return BadRequest("La imagen no debe superar 2 MB");
+
             if (!ModelState.IsValid)
                 return BadRequest(new { success = false, message = "Datos inválidos" });
 
@@ -65,6 +68,9 @@ namespace Fotografia.Controllers
         [HttpPost]
         public async Task<IActionResult> ActualizarFoto(int id, IFormFile foto)
         {
+            if (foto.Length > 2 * 1024 * 1024)
+                return BadRequest("La imagen no debe superar 2 MB");
+
             if (foto == null || foto.Length == 0)
                 return BadRequest("Archivo inválido");
 
