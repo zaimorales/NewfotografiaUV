@@ -33,6 +33,20 @@
     });
 });
 
+
+function estudiante_EsJpgValido(file) {
+    const maxSizeMB = 2;
+    if (!file) return false;
+    if (file.type !== "image/jpeg") return false;
+    if (!file.name.toLowerCase().endsWith(".jpg")) return false;
+    if (file.size > maxSizeMB * 1024 * 1024) {
+        alert(`La imagen no debe superar ${maxSizeMB} MB`);
+        return false;
+    }
+    return true;
+}
+
+
 function fnMostrarAgregarImagen() {
     $('#mdlAgregar').modal('show');
 }
