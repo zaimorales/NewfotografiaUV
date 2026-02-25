@@ -70,100 +70,133 @@
     </div>
 </div>
 
-<!-- modal -->
-<div class="modal fade" id="mdlAgregar" tabindex="-1" aria-labelledby="hAgregar" aria-hidden="true"
-     data-bs-keyboard="false" data-bs-backdrop="true">
+<!-- Modal para agregar estudiantes -->
+<div class="modal fade" id="mdlAgregar" tabindex="-1"
+     aria-labelledby="hAgregar"
+     aria-hidden="true"
+     data-bs-keyboard="false"
+     data-bs-backdrop="true">
+
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form id="formAgregarFotos" method="post">
+
+            <form id="formAgregarFotos"
+                  method="post"
+                  enctype="multipart/form-data">
+
                 @Html.AntiForgeryToken()
-                <!-- input de imagen, solo acepta jpg -->
-                <input multiple type="file" id="txtImagenes" accept=".jpg" class="d-none"
+
+                <!-- INPUT FINAL QUE VIAJA AL BACKEND -->
+                <input type="file"
+                       id="fotoEstudianteSeleccionada"
+                       name="Foto"
+                       class="d-none" />
+
+                <!-- INPUT REAL MULTIPLE -->
+                <input type="file"
+                       id="txtImagenes"
+                       multiple
+                       accept=".jpg,image/jpeg"
+                       class="d-none"
                        onchange="fnSubirFotoSeleccionada(this)">
 
+                <!-- Overlay Drag & Drop -->
                 <div id="divSoltarImagen"
                      class="position-absolute align-items-center justify-content-center bg-secondary bg-opacity-50 text-white fs-4"
                      style="display: none; inset: 0; z-index: 1000;">
                     Suelte las imágenes aquí...
                 </div>
+
                 <div class="modal-header">
                     <h5 class="modal-title" id="hAgregar">Estudiante</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"></button>
                 </div>
+
                 <div class="modal-body">
-                    <div id="divInfo" class="text-center" style="cursor: pointer;" onclick="fnSubirFotosAContenedor()">
+
+                    <!-- Área inicial -->
+                    <div id="divInfo"
+                         class="text-center"
+                         style="cursor: pointer;"
+                         onclick="document.getElementById('txtImagenes').click()">
+
                         <div class="m-auto">
                             <div class="card m-auto text-dark border-dark opacity-50"
                                  style="width: 160px; height: 160px;">
-                                <i class="fa-solid fa-user m-auto" style="font-size: 100px;"></i>
+                                <i class="fa-solid fa-user m-auto"
+                                   style="font-size: 100px;"></i>
                             </div>
                         </div>
+
                         <div class="mt-2 opacity-75">
                             <p class="fw-bold mb-1">Suba sus imágenes</p>
-                            <p class="mb-1">Puede seleccionar una o más imágenes para subir.</p>
-                            <p class="mb-1">Arrastre y suelte las imágenes aquí,</p>
-                            <p class="mb-1">o haga clic en este recuadro para seleccionarlas.</p>
+                            <p class="mb-1">Puede seleccionar una o más imágenes JPG.</p>
+                            <p class="mb-1">Arrastre y suelte aquí,</p>
+                            <p class="mb-1">o haga clic para seleccionarlas.</p>
                             <hr class="mt-3 mb-2 opacity-25">
                             <p class="mb-1"><strong>Formato permitido:</strong> JPG</p>
-                            <p class="mb-1"><strong>Nombre de archivo:</strong> [MATRÍCULA].jpg</p>
-                            <p class="mb-1"><strong>Ejemplo:</strong> S23021478.jpg</p>
+                            <p class="mb-1"><strong>Nombre esperado:</strong> [MATRÍCULA].jpg</p>
                         </div>
                     </div>
-                    <div id="divContenedorFotos" class="text-center d-none">
-                        <div class="ratio ratio-1x1 m-auto" style="max-width: 300px;">
-                            <img id="imgPrincipal" src="https://picsum.photos/id/10/500/300" alt="foto"
+
+                    <!-- CONTENEDOR PRINCIPAL -->
+                    <div id="divContenedorFotos"
+                         class="text-center d-none mt-4">
+
+                        <!-- Imagen principal -->
+                        <div class="ratio ratio-1x1 m-auto"
+                             style="max-width: 300px;">
+                            <img id="imgPrincipal"
+                                 src=""
                                  class="img-fluid">
                         </div>
+
                         <div class="mt-2 d-flex justify-content-center align-items-center gap-2">
-                            <span id="spFotoPrincipal" class="fs-5" style="font-weight: 600;">MATRÍCULA</span>
-                            <button id="btnEditarNombre" type="button" class="btn btn-link p-0"
-                                    title="Editar nombre">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                            <input id="txtFotoPrincipal" class="form-control form-control-sm d-none align-middle fs-5"
-                                   type="text" style="width: 220px; font-weight: 600;">
-                            <div class="d-flex gap-1">
-                                <button id="btnGuardarNombre" type="button"
-                                        class="btn btn-success btn-sm rounded-circle d-none" title="Guardar">
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                                <button id="btnCancelarNombre" type="button"
-                                        class="btn btn-danger btn-sm rounded-circle d-none" title="Cancelar">
-                                    <i class="fa-solid fa-xmark"></i>
-                                </button>
-                            </div>
+                            <span id="spFotoPrincipal"
+                                  class="fs-5 fw-bold">
+                                Foto seleccionada
+                            </span>
                         </div>
-                        <div id="divFotos" class="d-flex flex-wrap gap-2 mt-4">
-                            <!-- <button class="ratio ratio-1x1 btn overflow-hidden rounded-0" style="width: 60px; height: 60px; min-width: 60px; min-height: 60px;" onclick="fnMostrarPrincipal(this)">
-                                <img src="https://picsum.photos/id/10/200/100" alt="foto" class="img-fluid">
-                            </button> -->
-                            <!-- boton para subir foto -->
-                            <div id="divSubirFoto" class="d-flex align-items-center"
-                                 style="max-width: 60px; max-height: 60px; min-width: 60px; min-height: 60px; padding: .7rem;">
-                                <!-- <button class="btn btn-primary p-0 w-100 h-100 rounded-circle"
-                                        onclick="fnSubirFotos()">
-                                    <i class="fa-solid fa-plus fs-5"></i>
-                                </button> -->
-                                <label for="txtImagenes" class="btn btn-primary p-0 w-100 h-100 rounded-circle d-flex justify-content-center align-items-center">
+
+                        <!-- Miniaturas -->
+                        <div id="divFotos"
+                             class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+
+                            <!-- Botón agregar más -->
+                            <div id="divSubirFoto"
+                                 class="d-flex align-items-center"
+                                 style="width: 60px; height: 60px; padding: .7rem;">
+                                <label for="txtImagenes"
+                                       class="btn btn-primary p-0 w-100 h-100 rounded-circle d-flex justify-content-center align-items-center">
                                     <i class="fa-solid fa-plus fs-5"></i>
                                 </label>
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
-            </form>
-            <div class="modal-footer d-none">
-                <div class="d-flex w-100 gap-2">
-                    <button type="button" class="btn btn-danger w-100"
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
                             data-bs-dismiss="modal">
                         Cancelar
                     </button>
-                    <button type="button" onclick="fnGuardarFotos()" class="btn btn-success w-100">Guardar</button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+                        Guardar
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
+
 
 <!-- Modal de confirmación para cerrar -->
 <div class="modal fade" id="mdlConfirmarCerrar" tabindex="-1" aria-labelledby="hConfirmarCerrar"
