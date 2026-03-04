@@ -109,12 +109,24 @@
     </div>
 </div>
 
+<!-- modal de alertas-->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+    <div id="toastMensaje" class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastText">
+                Empleado agregado correctamente
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal para agregar empleado -->
 <div class="modal fade" id="mdlAgregarEmpleado" tabindex="-1" aria-labelledby="hAgregarEmpleado" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
 
-            <form id="frmAgregarEmpleado" method="post" enctype="multipart/form-data">
+            <form id="frmAgregarEmpleado" method="post" class="needs-validation" enctype="multipart/form-data" novalidate>
                 <input type="file" id="txtFotosEmpleado" multiple accept=".jpg,image/jpeg" class="d-none"
                        onchange="empleado_OnFilesSelected(this)">
 
@@ -134,30 +146,64 @@
 
                         <!-- CAMPOS DEL EMPLEADO -->
                         <div class="col-md-6">
-                            <label class="form-label">Usuario</label>
-                            <input type="text" name="SUsuario" class="form-control" required />
+                            
+                            <label for="inputUsuario" class="form-label">Usuario</label>
+                            <input type="text" name="SUsuario" class="form-control" id="inputUsuario" maxlength="50" required />
+                            <small class="text-muted">
+                                <span id="cntUsuario">0</span>/50 caracteres
+                            </small>
+                            <div class="invalid-feedback">
+                                Porfavor agrega un nombre de usuario.
+                            </div>
+                            
                         </div>
+
                         <div class="col-md-6">
-                            <label class="form-label">Departamento</label>
-                            <input type="text" name="SDep" class="form-control" required />
+
+                            <label for="inputDep" class="form-label">Departamento</label>
+                            <input type="text" name="SDep" class="form-control" id="inputDep" maxlength="100" required />
+                            <small class="text-muted">
+                                <span id="cntDep">0</span>/100 caracteres
+                            </small>
+                            <div class="invalid-feedback">
+                                Porfavor agrega un nombre departamento.
+                            </div>
+
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">No. Personal</label>
-                            <input type="number" name="NNoPerson" class="form-control" required />
+
+                            <label for="validationCustom03" class="form-label">No. Personal</label>
+                            <input type="text" name="NNoPerson" class="form-control" id="validationCustom03" 
+                            pattern="[0-9]+" inputmode="numeric" maxlength="10"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')" required />
+                            <div class="invalid-feedback">
+                                Porfavor agrega el número de personal.
+                            </div>
+
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">Permisos</label>
+
+                            <label for="validationCustom03" class="form-label">Permisos</label>
                             <input type="text" name="CPermisos" maxlength="1" class="form-control" required />
+                            <div class="invalid-feedback">
+                                Porfavor agrega los permisos.
+                            </div>
+
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label">¿Admin?</label>
-                            <select name="BAdmin" class="form-select" required>
+
+                            <label for="validationCustom04" class="form-label">¿Admin?</label>
+                            <select name="BAdmin" class="form-select" id="validationCustom04" required>
                                 <option value="true">Sí</option>
                                 <option value="false">No</option>
                             </select>
+                            <div class="invalid-feedback">
+                                Porfavor elije una opcion.
+                            </div>
+
                         </div>
                         <!-- INPUT OCULTO: este es el que viaja al backend -->
                         <input type="file" id="fotoEmpleadoSeleccionada" name="Foto" class="d-none" />
@@ -167,12 +213,10 @@
                                onchange="empleado_OnFilesSelected(this)">
 
                         <!-- Área inicial de carga -->
-                        <div id="divInfoEmpleado" class="text-center mt-4" style="cursor: pointer;"
-                             onclick="empleado_openFileInput()">
+                        <div id="divInfoEmpleado" class="text-center mt-4">
                             <div class="m-auto">
-                                <div class="card m-auto text-dark border-dark opacity-50"
-                                     style="width: 160px; height: 160px;">
-                                    <i class="fa-solid fa-user m-auto" style="font-size: 100px;"></i>
+                                <div class="card m-auto text-dark border-dark opacity-50" style="width: 160px; height: 160px; cursor: pointer;" onclick="empleado_openFileInput()">
+                                    <i class="fa-solid fa-user m-auto" style="font-size: 100px; "></i>
                                 </div>
                             </div>
 

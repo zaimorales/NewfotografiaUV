@@ -61,6 +61,10 @@ document.getElementById("frmAgregarEmpleado").addEventListener("submit", async f
         return;
     }
 
+    // Convertir usuario a minúsculas antes de enviar
+    const inputUsuario = document.querySelector('[name="SUsuario"]');
+    inputUsuario.value = inputUsuario.value.toLowerCase();
+
     const form = e.target;
     const formData = new FormData(form);
 
@@ -72,12 +76,17 @@ document.getElementById("frmAgregarEmpleado").addEventListener("submit", async f
 
         if (response.ok) {
             const modal = bootstrap.Modal.getInstance(document.getElementById("mdlAgregarEmpleado"));
-            modal.hide();
+            // Esperar a que el modal cierre ANTES de mostrar el toast
+            document.getElementById("mdlAgregarEmpleado").addEventListener("hidden.bs.modal", function handler() {
+                mostrarToast("Empleado agregado correctamente ✅", "success");
+                setTimeout(() => location.reload(), 3000);
+                this.removeEventListener("hidden.bs.modal", handler); // limpieza del listener
+            });
 
-            alert("Empleado agregado correctamente ✅");
-            location.reload(); // recarga la tabla
+            modal.hide();
+            
         } else {
-            alert("Ocurrió un error al guardar el empleado ❌");
+            mostrarToast("Error al agregar el empleado ❌", "error");
         }
     } catch (error) {
         console.error("Error:", error);
@@ -512,6 +521,19 @@ document.getElementById("mdlAgregarEmpleado").addEventListener("hidden.bs.modal"
     const form = document.getElementById("frmAgregarEmpleado");
     form.reset();
     empleado_ResetFotosUI();
+
+    // Quitar clase de validación de Bootstrap
+    form.classList.remove('was-validated');
+
+    // Reiniciar contadores de caracteres
+    contadores.forEach(([idInput, idSpan, max]) => {
+        const input = document.getElementById(idInput);
+        const span = document.getElementById(idSpan);
+        if (input && span) {
+            span.textContent = "0";
+            span.style.color = "";
+        }
+    });
 });
 
 function empleado_VerificarDuplicado(file, url) {
@@ -649,3 +671,60 @@ document.getElementById("mdlConfirmarEliminarEmpleado")
         alertBox.classList.add("d-none");
         alertBox.textContent = "";
     });
+
+(function () {
+    'use strict'
+
+    var forms = document.querySelectorAll('.needs-validation')
+
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+                form.classList.add('was-validated');
+            }
+        }, false)
+    })
+})()
+
+// Configuración de contadores: [idInput, idSpan, max]
+const contadores = [
+    ['inputUsuario', 'cntUsuario', 50],
+    ['inputDep', 'cntDep', 100],
+];
+
+contadores.forEach(([idInput, idSpan, max]) => {
+    const input = document.getElementById(idInput);
+    const span = document.getElementById(idSpan);
+
+    if (!input || !span) return;
+
+    input.addEventListener('input', function () {
+        const actual = this.value.length;
+        span.textContent = actual;
+        span.style.color = actual >= max * 0.9 ? 'red' : '';
+    });
+});
+
+/// alertas toast
+function mostrarToast(mensaje, tipo = "success") {
+    const colores = {
+        success: "bg-success",
+        error: "bg-danger",
+        warning: "bg-warning text-dark",
+        info: "bg-info text-dark"
+    };
+
+    const toastEl = document.getElementById("toastMensaje");
+    const toastTexto = document.getElementById("toastText");
+
+    // Quitar colores anteriores y aplicar el nuevo
+    toastEl.classList.remove("bg-success", "bg-danger", "bg-warning", "bg-info", "bg-primary", "text-dark");
+    toastEl.classList.add(...(colores[tipo] || colores.success).split(" "));
+
+    toastTexto.textContent = mensaje;
+
+    const toast = bootstrap.Toast.getInstance(toastEl) || new bootstrap.Toast(toastEl, { delay: 3000 });
+    toast.show();
+}

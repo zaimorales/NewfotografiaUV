@@ -55,6 +55,9 @@ html, body {
     margin-bottom: .8rem !important;
 }
 
+.btn-close{
+    filter: invert(1);
+}
 
 @media (min-width: 768px) { #divNombre { max-width: 200px; } }
 @media (min-width: 850px) { #divNombre { max-width: 280px; } }
