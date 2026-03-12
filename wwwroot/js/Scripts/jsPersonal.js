@@ -690,7 +690,10 @@ document.getElementById("btnConfirmarEliminarEmpleado")
             .getInstance(document.getElementById("mdlConfirmarEliminarEmpleado"))
             .hide();
 
-        location.reload();
+        mostrarToast("Empleado eliminado correctamente", "success");
+
+        setTimeout(() => location.reload(), 3000);
+        //location.reload();
     });
 
 document.getElementById("mdlConfirmarEliminarEmpleado")
