@@ -59,6 +59,11 @@ html, body {
     filter: invert(1);
 }
 
+.bg-warning .btn-close,
+.bg-info .btn-close {
+    filter: invert(0);
+}
+
 @media (min-width: 768px) { #divNombre { max-width: 200px; } }
 @media (min-width: 850px) { #divNombre { max-width: 280px; } }
 @media (min-width: 992px) { #divNombre { max-width: 500px; } }

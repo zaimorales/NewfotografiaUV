@@ -68,49 +68,40 @@ namespace Fotografia.Controllers
         [HttpPost]
         public async Task<IActionResult> ActualizarFoto(int id, IFormFile foto)
         {
-            if (foto.Length > 2 * 1024 * 1024)
-                return BadRequest("La imagen no debe superar 2 MB");
-
+            // 1. Null check PRIMERO (antes de acceder a cualquier propiedad)
             if (foto == null || foto.Length == 0)
                 return BadRequest("Archivo inválido");
-
+            
+            // 2. Tamaño
+            if (foto.Length > 2 * 1024 * 1024)
+                return BadRequest("La imagen no debe superar 2 MB");
+            
+            // 3. Formato
             var extension = Path.GetExtension(foto.FileName).ToLower();
             if (extension != ".jpg" || foto.ContentType != "image/jpeg")
                 return BadRequest("Solo se permiten imágenes JPG 1");
 
-            byte[] fotoBytes;
+            // 4. Convertir a bytes
+            byte[] fotoNueva;
             using (var ms = new MemoryStream())
             {
                 await foto.CopyToAsync(ms);
-                fotoBytes = ms.ToArray();
+                fotoNueva = ms.ToArray();
             }
 
-            await _daEmpleado.ActualizarFotoEmpleado(id, fotoBytes);
+            // 5. Obtener foto actual y comparar
+            var empleado = (await _daEmpleado.ObtenerEmpleados(id)).FirstOrDefault();
+            if (empleado == null)
+                return NotFound("Empleado no encontrado");
+
+            if (empleado.BFoto != null && empleado.BFoto.SequenceEqual(fotoNueva))
+                return BadRequest("La imagen nueva es idéntica a la actual");
+
+            // 6. Guardar
+            await _daEmpleado.ActualizarFotoEmpleado(id, fotoNueva);
 
             return Ok();
         }
-
-        [HttpPost]
-        public async Task<IActionResult> ActualizarFotoEmpleado(int id, IFormFile foto)
-        {
-            if (foto == null || foto.Length == 0)
-                return BadRequest("Imagen inválida");
-
-            var extension = Path.GetExtension(foto.FileName).ToLower();
-            if (extension != ".jpg" || foto.ContentType != "image/jpeg")
-                return BadRequest("Solo se permiten imágenes JPG 2");
-
-            byte[] bytes;
-            using (var ms = new MemoryStream())
-            {
-                await foto.CopyToAsync(ms);
-                bytes = ms.ToArray();
-            }
-
-            await _daEmpleado.ActualizarFotoEmpleado(id, bytes);
-            return Ok();
-        }
-
 
         [HttpPost]
         public IActionResult EliminarEmpleado([FromBody] VmEliminarEmpleado vm)

@@ -44,7 +44,8 @@ function empleado_EsJpgValido(file) {
     if (!file.name.toLowerCase().endsWith(".jpg")) return false;
 
     if (file.size > maxSizeMB * 1024 * 1024) {
-        alert(`La imagen no debe superar ${maxSizeMB} MB`);
+        //alert(`La imagen no debe superar ${maxSizeMB} MB`);
+        mostrarToast("La imagen no debe superar 2 MB", "warning");
         return false;
     }
 
@@ -57,7 +58,7 @@ document.getElementById("frmAgregarEmpleado").addEventListener("submit", async f
     // Validar que haya una foto seleccionada
     const fotoInput = document.getElementById("fotoEmpleadoSeleccionada");
     if (!fotoInput.files || fotoInput.files.length === 0) {
-        alert("Por favor, seleccione una imagen del empleado.");
+        mostrarToast("Por favor, seleccione una imagen del empleado.","warning");
         return;
     }
 
@@ -78,7 +79,7 @@ document.getElementById("frmAgregarEmpleado").addEventListener("submit", async f
             const modal = bootstrap.Modal.getInstance(document.getElementById("mdlAgregarEmpleado"));
             // Esperar a que el modal cierre ANTES de mostrar el toast
             document.getElementById("mdlAgregarEmpleado").addEventListener("hidden.bs.modal", function handler() {
-                mostrarToast("Empleado agregado correctamente ✅", "success");
+                mostrarToast("Empleado agregado correctamente", "success");
                 setTimeout(() => location.reload(), 3000);
                 this.removeEventListener("hidden.bs.modal", handler); // limpieza del listener
             });
@@ -86,11 +87,10 @@ document.getElementById("frmAgregarEmpleado").addEventListener("submit", async f
             modal.hide();
             
         } else {
-            mostrarToast("Error al agregar el empleado ❌", "error");
+            mostrarToast("Error al agregar el empleado", "error");
         }
     } catch (error) {
         console.error("Error:", error);
-        alert("Error inesperado al guardar.");
     }
 });
 
@@ -132,6 +132,10 @@ function fnVerEmpleado(id, usuario) {
 }
 
 // EDICION DE FOTO DE EMPLEADO
+
+// Guarda los bytes de la foto actual para comparar al seleccionar archivo nuevo
+let fotoActualBytes = null;
+
 function fnEditarEmpleado(id, usuario) {
 
     // Crear instancia del modal
@@ -140,11 +144,19 @@ function fnEditarEmpleado(id, usuario) {
     // Mostrar usuario/matrícula
     document.getElementById("spMatriculaEditarFotoEmpleado").innerText = usuario;
 
-    // Cargar foto actual del backend
-    document.getElementById("imgEditarFotoEmpleado").src = `/Personal/MostrarFoto?id=${id}`;
-
     // Guardar el ID en el input file
     document.getElementById("txtNuevaFotoEmpleado").setAttribute("data-id", id);
+
+    // Descargar foto actual → guardar bytes para comparar y mostrar imagen
+    fotoActualBytes = null;
+    fetch(`/Personal/MostrarFoto?id=${id}`)
+        .then(r => r.arrayBuffer())
+        .then(buffer => {
+            fotoActualBytes = new Uint8Array(buffer);
+            // Reusar los bytes descargados para mostrar la imagen (evita segunda petición)
+            const blob = new Blob([fotoActualBytes], { type: "image/jpeg" });
+            document.getElementById("imgEditarFotoEmpleado").src = URL.createObjectURL(blob);
+        });
 
     // Mostrar modal
     modal.show();
@@ -154,30 +166,46 @@ document.getElementById("txtNuevaFotoEmpleado")
     .addEventListener("change", function () {
 
         const file = this.files[0];
-        const btnSubir = document.getElementById("txtNuevaFotoEmpleado");
+        if (!file) return;
 
         if (!file.name.toLowerCase().endsWith(".jpg")) {
-            alert("Solo se permiten imágenes JPG js1");
+            mostrarToast("Solo se permite formato JPG", "warning");
             this.value = "";
             return;
         }
 
-        if (file) { // si ya se selecciono un archivo el boton de subir se oculta
-            btnSubir.disabled = true;
-            btnSubir.style.display = "none";
-        }
-
+        // Leer bytes del archivo nuevo y comparar con la foto actual ANTES de mostrar preview
+        const inputRef = this;
         const reader = new FileReader();
         reader.onload = e => {
+            const nuevosBytes = new Uint8Array(e.target.result);
+
+            // Comparar solo si ya se descargaron los bytes actuales
+            if (fotoActualBytes && fotoActualBytes.length === nuevosBytes.length) {
+                const esMismaFoto = fotoActualBytes.every((byte, i) => byte === nuevosBytes[i]);
+                if (esMismaFoto) {
+                    mostrarToast("La imagen seleccionada es idéntica a la actual, elige otra foto", "warning");
+                    inputRef.value = "";
+                    return;
+                }
+            }
+
+            // Pasó la validación → ocultar input y mostrar preview
+            inputRef.disabled = true;
+            inputRef.style.display = "none";
+
             const imgPreview = document.getElementById("imgPreviewNuevaFoto");
-            imgPreview.src = e.target.result;
+            imgPreview.src = URL.createObjectURL(file);
             imgPreview.classList.remove("d-none");
         };
-        reader.readAsDataURL(file);
+
+        reader.readAsArrayBuffer(file); // ArrayBuffer para poder comparar bytes
     });
 
 document.getElementById("mdlEditarFotoEmpleado")
     .addEventListener("hidden.bs.modal", () => {
+
+        fotoActualBytes = null;
 
         const input = document.getElementById("txtNuevaFotoEmpleado");
         // RESET TOTAL DEL INPUT FILE
@@ -200,7 +228,7 @@ async function fnGuardarNuevaFoto() {
     const file = input.files[0];
 
     if (!file) {
-        alert("Seleccione una imagen");
+        mostrarToast("Seleccione una imagen","warning");
         return;
     }
 
@@ -214,15 +242,19 @@ async function fnGuardarNuevaFoto() {
     });
 
     if (response.ok) {
-        alert("Foto actualizada correctamente ✅");
+        document.getElementById("mdlEditarFotoEmpleado").addEventListener("hidden.bs.modal", function handler() {
+            mostrarToast("Foto actualizada correctamente", "success");
+            setTimeout(() => location.reload(), 3000);
+            this.removeEventListener("hidden.bs.modal", handler);
+        });
 
-        bootstrap.Modal
-            .getInstance(document.getElementById("mdlEditarFotoEmpleado"))
-            .hide();
+        bootstrap.Modal.getInstance(document.getElementById("mdlEditarFotoEmpleado")).hide();
 
-        location.reload();
     } else {
-        alert("Error al actualizar la foto ❌");
+        // Leer el mensaje que manda el servidor
+        const mensaje = await response.text();
+        mostrarToast(mensaje || "Error al actualizar la foto", "error");
+       
     }
 }
 
@@ -233,29 +265,31 @@ async function editarEmpleado_GuardarFoto() {
     const file = input.files[0];
 
     if (!file) {
-        alert("Seleccione una imagen");
+        mostrarToast("Seleccione una imagen", "warning");
         return;
     }
 
+    
     const formData = new FormData();
     formData.append("id", id);
     formData.append("foto", file);
 
-    const response = await fetch("/Personal/ActualizarFotoEmpleado", {
+    const response = await fetch("/Personal/ActualizarFoto", {
         method: "POST",
         body: formData
     });
 
     if (response.ok) {
-        alert("Foto actualizada correctamente ✅");
+        document.getElementById("mdlEditarFotoEmpleado").addEventListener("hidden.bs.modal", function handler() {
+            mostrarToast("Foto actualizada correctamente", "success");
+            setTimeout(() => location.reload(), 3000);
+            this.removeEventListener("hidden.bs.modal", handler);
+        });
 
-        bootstrap.Modal
-            .getInstance(document.getElementById("mdlEditarFotoEmpleado"))
-            .hide();
+        bootstrap.Modal.getInstance(document.getElementById("mdlEditarFotoEmpleado")).hide();
 
-        location.reload();
     } else {
-        alert("Error al actualizar la foto ❌");
+        mostrarToast("Error al actualizar la foto", "error");
     }
 }
 
@@ -280,7 +314,7 @@ function empleado_OnFilesSelected(input) {
     const archivosInvalidos = nuevosArchivos.filter(f => !empleado_EsJpgValido(f));
 
     if (archivosInvalidos.length > 0) {
-        alert("Solo se permiten imágenes JPG");
+        mostrarToast("Solo se permiten imágenes JPG click","warning");
 
         // RESET limpio
         input.value = "";
@@ -416,7 +450,7 @@ modalEmpleado.addEventListener("drop", (e) => {
     const jpgFiles = files.filter(empleado_EsJpgValido);
 
     if (jpgFiles.length === 0) {
-        alert("Solo se permiten imágenes JPG. js2");
+        mostrarToast("Solo se permiten imágenes JPG. drag&drop","warning");
         return;
     }
 
@@ -710,8 +744,8 @@ contadores.forEach(([idInput, idSpan, max]) => {
 /// alertas toast
 function mostrarToast(mensaje, tipo = "success") {
     const colores = {
-        success: "bg-success",
-        error: "bg-danger",
+        success: "bg-success text-white",
+        error: "bg-danger text-white",
         warning: "bg-warning text-dark",
         info: "bg-info text-dark"
     };
@@ -720,7 +754,8 @@ function mostrarToast(mensaje, tipo = "success") {
     const toastTexto = document.getElementById("toastText");
 
     // Quitar colores anteriores y aplicar el nuevo
-    toastEl.classList.remove("bg-success", "bg-danger", "bg-warning", "bg-info", "bg-primary", "text-dark");
+
+    toastEl.classList.remove("bg-success", "bg-danger", "bg-warning", "bg-info", "bg-primary", "text-dark", "text-white");
     toastEl.classList.add(...(colores[tipo] || colores.success).split(" "));
 
     toastTexto.textContent = mensaje;

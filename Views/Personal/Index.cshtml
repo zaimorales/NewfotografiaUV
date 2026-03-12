@@ -110,7 +110,7 @@
 </div>
 
 <!-- modal de alertas-->
-<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
     <div id="toastMensaje" class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body" id="toastText">
@@ -127,8 +127,7 @@
         <div class="modal-content">
 
             <form id="frmAgregarEmpleado" method="post" class="needs-validation" enctype="multipart/form-data" novalidate>
-                <input type="file" id="txtFotosEmpleado" multiple accept=".jpg,image/jpeg" class="d-none"
-                       onchange="empleado_OnFilesSelected(this)">
+                <input type="file" id="txtFotosEmpleado" multiple accept=".jpg,image/jpeg" class="d-none" onchange="empleado_OnFilesSelected(this)">
 
                 <div id="divDropEmpleado"
                      class="position-absolute align-items-center justify-content-center bg-secondary bg-opacity-50 text-white fs-4"
